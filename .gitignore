@@ -1,0 +1,7 @@
+*.csv
+bin/*
+build/*
+lib/*
+include/*
+*.cfg
+*.spec
