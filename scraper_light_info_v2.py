@@ -16,7 +16,7 @@ file_name = 'real_estate_data_v2.csv'
 file_path = os.path.join(application_path,file_name)
 
 #Target website
-website = "https://www.realtor.ca/map#ZoomLevel=12&Center=43.833549%2C-79.757988&LatitudeMax=43.89197&LongitudeMax=-79.59354&LatitudeMin=43.77507&LongitudeMin=-79.92244&Sort=1-D&GeoName=Toronto%2C%20ON&PropertyTypeGroupID=1&PropertySearchTypeId=0&TransactionTypeId=2&Currency=CAD"
+website = "https://www.realtor.ca/map#ZoomLevel=14&Center=43.832558%2C-79.807941&LatitudeMax=43.84717&LongitudeMax=-79.76683&LatitudeMin=43.81794&LongitudeMin=-79.84905&Sort=6-D&GeoName=Toronto%2C%20ON&PropertyTypeGroupID=1&PropertySearchTypeId=0&TransactionTypeId=2&Currency=CAD"
 #chromedriver location
 path = "/Users/paul-emile/Downloads/chromedriver"
 
@@ -195,16 +195,16 @@ def move_left(driver):
     elmt = driver.find_element(by="xpath",value=("//div[@id='mapBodyCon']/div/div/div[2]/div[2]"))
     elmt.click()
 
-    while new_long_max<long_min: #the longitude is negative
+    while new_long_max>long_min: #the longitude is negative
 
         # elmt.send_keys(Keys.LEFT)
         action = ActionChains(driver)
-        action.key_down(Keys.LEFT).pause(0.4).key_up(Keys.LEFT).perform()
+        action.key_down(Keys.LEFT).pause(1).key_up(Keys.LEFT).perform()
 
         url = driver.current_url
         url = parse_url(url)
         fragment = url['fragment']
-        new_long_min = float(find_in_fragment('LongitudeMax=',fragment))
+        new_long_max = float(find_in_fragment('LongitudeMax=',fragment))
         #print(new_long_min,long_max)
 
 def move_down(driver):
@@ -256,13 +256,11 @@ while need_move:
     max_page = get_max_page(driver)
 
     print(max_page)
+
     for i in range(max_page):
         df = scrape_page(df)
-        if len_df ==df.shape[0]:
-            break
-        else:
-            len_df = df.shape[0]
 
+    df.drop_duplicates(subset=['address'],inplace=True)
     moving_from_left_to_right,need_move = move(driver,LAT_MIN,LONG_MAX,LONG_MIN,moving_from_left_to_right)
     time.sleep(4)#give the time to laod the page
 df.drop_duplicates(subset=['address'],inplace=True)
