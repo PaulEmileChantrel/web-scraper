@@ -9,7 +9,8 @@ import os
 import sys
 from selenium.webdriver.common.keys import Keys
 from url_parser import parse_url, get_url, get_base_url
-
+from datetime import date
+from datetime import timedelta
 # Application path
 application_path = "/Users/paul-emile/Documents/PythonProject/scraping/"
 file_name = 'real_estate_data_v2.csv'
@@ -41,7 +42,7 @@ LONG_MIN = -79.92244 #left
 LONG_MAX = -79.05638  #right
 LAT_MIN = 43.61090
 moving_from_left_to_right = True
-
+today = date.today()
 # load or create a dataframe
 try:
     df = pd.read_csv(file_path)
@@ -87,9 +88,19 @@ def scrape_page(df):
         try :
             listed_since = container.find_element(by="xpath",value='./span/div/div[2]/div[2]').text
         except:
-            since,time_number,time_unit = "",0,""
+            posted = today
         else:
-            since,time_number,time_unit = listed_since.split(' ')
+            time_number,time_unit,since = listed_since.split(' ')#depend the language
+            print(time_number,time_unit)
+            if time_unit == 'min':
+                posted = today - timedelta(minutes=float(time_number))
+            elif time_unit == 'hours':
+                posted = today - timedelta(hours=float(time_number))
+            elif time_unit == 'days':
+                posted = today - timedelta(days=float(time_number))
+            else:# more than 7 days ago
+                posted = today- timedelta(days=float(8))
+            print(posted)
         try :#In case we don't have a bathroom
             bathrooms = container.find_element(by="xpath",value='./span/div/a/div/div/div[4]/div[2]/div/div').text
         except:
@@ -109,8 +120,7 @@ def scrape_page(df):
         #create a new row
         new_row = pd.DataFrame({'id':[id],'link':[link],
                                         'image':[image],
-                                        'time_number':[time_number],
-                                        'time_unit':[time_unit],
+                                        'posted':[posted],
                                         'price':[price],
                                         'address':[address],
                                         'lat':[lat],
