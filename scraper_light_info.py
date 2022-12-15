@@ -50,8 +50,15 @@ def scrape_page(df):
             link = container.find_element(by="xpath",value='./span/div/a').get_attribute("href")
         except:
             link = ""
-            #print(container.find_element(by="xpath",value='./span/div').page_source)
-        lat_long = container.find_element(by="xpath",value='./span/div').get_attribute("data-value")#data_value
+            #print(container.find_element(by="xpath",value='./span/div').page_source
+        try:
+            lat_long = container.find_element(by="xpath",value='./span/div').get_attribute("data-value")#data_value
+        except:
+
+            id,lat,long = 0,0,0
+        else:
+            # string processing
+            id,lat,long = lat_long.split('_')
         image = container.find_element(by="xpath",value='./span/div/a/div/img').get_attribute("src")
         price = container.find_element(by="xpath",value='./span/div/a/div/div/div').text
         address = container.find_element(by="xpath",value='./span/div/a/div/div/div[3]').text
@@ -73,7 +80,8 @@ def scrape_page(df):
             smaller_rooms = 0
 
         since,time_number,time_unit = listed_since.split(' ')
-        price = float(price.replace('$','').replace(' ',''))
+        if isinstance(price,str):
+            price = float(price.replace('$','').replace(' ',''))
         #print(price)
 
         #create a new row
@@ -100,7 +108,7 @@ def scrape_page(df):
     next_page_link.click()
 
     # wait a bit
-    time.sleep(4)
+    time.sleep(1)
     return df
 
 len_df = df.shape[0]
