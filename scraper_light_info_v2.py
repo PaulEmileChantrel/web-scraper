@@ -11,9 +11,10 @@ from selenium.webdriver.common.keys import Keys
 from url_parser import parse_url, get_url, get_base_url
 from datetime import date
 from datetime import timedelta
+
 # Application path
 application_path = "/Users/paul-emile/Documents/PythonProject/scraping/"
-file_name = 'real_estate_data_v2.csv'
+file_name = 'real_estate_data_v2p2.csv'
 file_path = os.path.join(application_path,file_name)
 
 #Target website
@@ -50,7 +51,10 @@ except:
     df = pd.DataFrame()
 
 
+
 def scrape_page(df):
+
+
     #get html container with their xpath
     containers = driver.find_elements(by="xpath",value="//div[@class='cardCon']")
 
@@ -88,7 +92,7 @@ def scrape_page(df):
         try :
             listed_since = container.find_element(by="xpath",value='./span/div/div[2]/div[2]').text
         except:
-            posted = today
+            posted = today - timedelta(days=float(8))
         else:
             time_number,time_unit,since = listed_since.split(' ')#depend the language
             print(time_number,time_unit)
@@ -132,6 +136,9 @@ def scrape_page(df):
         #print(new_row)
         df = pd.concat([df,new_row],ignore_index=True)
 
+    
+
+
     print(df.shape[0])
     df.to_csv(file_path,index=False)
 
@@ -160,10 +167,10 @@ def get_max_page(driver):
         max_page = 0
     else:
         if max_page =='50+':
-            return 50
+            return 50-1
         else:
             try:
-                return int(max_page)
+                return int(max_page)-1
             except:
                 return 0
 
@@ -265,7 +272,7 @@ need_move = True
 while need_move:
     max_page = get_max_page(driver)
 
-    print(max_page)
+    #print(max_page)
 
     for i in range(max_page):
         df = scrape_page(df)
