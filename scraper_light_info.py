@@ -13,7 +13,7 @@ file_name = 'real_estate_data.csv'
 file_path = os.path.join(application_path,file_name)
 
 #Target website
-website = "https://www.realtor.ca/carte#ZoomLevel=10&Center=43.658183%2C-79.345829&LatitudeMax=44.12234&LongitudeMax=-78.05356&LatitudeMin=43.19041&LongitudeMin=-80.63810&Sort=6-D&PGeoIds=g30_dpz89rm7&GeoName=Toronto%2C%20ON&PropertyTypeGroupID=1&PropertySearchTypeId=0&TransactionTypeId=2&Currency=CAD"
+website = target_link
 #chromedriver location
 path = "/Users/paul-emile/Downloads/chromedriver"
 

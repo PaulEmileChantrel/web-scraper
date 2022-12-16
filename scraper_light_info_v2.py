@@ -18,7 +18,7 @@ file_name = 'real_estate_data_v2p2.csv'
 file_path = os.path.join(application_path,file_name)
 
 #Target website
-website = "https://www.realtor.ca/map#ZoomLevel=14&Center=43.832558%2C-79.807941&LatitudeMax=43.84717&LongitudeMax=-79.76683&LatitudeMin=43.81794&LongitudeMin=-79.84905&Sort=6-D&GeoName=Toronto%2C%20ON&PropertyTypeGroupID=1&PropertySearchTypeId=0&TransactionTypeId=2&Currency=CAD"
+website = target_link
 #chromedriver location
 path = "/Users/paul-emile/Downloads/chromedriver"
 
@@ -136,7 +136,7 @@ def scrape_page(df):
         #print(new_row)
         df = pd.concat([df,new_row],ignore_index=True)
 
-    
+
 
 
     print(df.shape[0])

@@ -11,16 +11,17 @@ from selenium.webdriver.common.keys import Keys
 from url_parser import parse_url, get_url, get_base_url
 from datetime import date
 from datetime import timedelta
-
+from config import target_link
 #Similar to V2p2 except we open a property page
 
 # Application path
-application_path = "/Users/paul-emile/Documents/PythonProject/scraping/"
+application_path = os.path.dirname(sys.executable)#"/Users/paul-emile/Documents/PythonProject/scraping/"
 file_name = 'real_estate_data_v3.csv'
 file_path = os.path.join(application_path,file_name)
-file_path_details = os.path.join(application_path,'real_estate_data_v3_details.csv')
+file_name_details = 'real_estate_data_v3_details.csv'
+file_path_details = os.path.join(application_path,file_name_details)
 #Target website'
-website = "https://www.realtor.ca/map#ZoomLevel=14&Center=43.832558%2C-79.807941&LatitudeMax=43.84717&LongitudeMax=-79.76683&LatitudeMin=43.81794&LongitudeMin=-79.84905&Sort=6-D&GeoName=Toronto%2C%20ON&PropertyTypeGroupID=1&PropertySearchTypeId=0&TransactionTypeId=2&Currency=CAD"
+website = target_link
 #chromedriver location
 path = "/Users/paul-emile/Downloads/chromedriver"
 
@@ -280,7 +281,7 @@ def move(driver,LAT_MIN,LONG_MAX,LONG_MIN,moving_from_left_to_right):
             return moving_from_left_to_right,True
 
 
-def scrap_property_page():
+def scrap_property_page(link):
     #1 location
     #get html container with their xpath
     try:
@@ -384,12 +385,13 @@ while need_move:
     for i in range(new_property):
         property_index = df.shape[0]-1-i
         link = df['link'][property_index]
-        detail_df = scrape_detail(detail_df,link)
+        df_details = scrape_detail(df_details,link)
 
 
     driver.get(main_page_url)
-
+    time.sleep(4)
     df.drop_duplicates(subset=['address'],inplace=True)
+    df_details.drop_duplicates(subset=['link'],inplace=True)
     moving_from_left_to_right,need_move = move(driver,LAT_MIN,LONG_MAX,LONG_MIN,moving_from_left_to_right)
     time.sleep(4)#give the time to laod the page
 df.drop_duplicates(subset=['address'],inplace=True)
