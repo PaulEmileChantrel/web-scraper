@@ -282,6 +282,22 @@ def move(driver,LAT_MIN,LONG_MAX,LONG_MIN,moving_from_left_to_right):
 
 
 def scrap_property_page(link):
+
+
+    #0 images
+    try:
+        container = driver.find_element(by="xpath",value="//div[@class='scrollableArea']")
+    except:
+        pass
+    images = []
+    i = 1
+    while True:
+        try:
+            images.append(container.find_element(by="xpath",value="./a["+i+"]"))
+        except:
+            break
+        i += 1
+
     #1 location
     #get html container with their xpath
     try:
