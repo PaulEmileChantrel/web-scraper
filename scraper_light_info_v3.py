@@ -288,7 +288,8 @@ def scrap_property_page(link):
     try:
         container = driver.find_element(by="xpath",value="//div[@class='scrollableArea']")
     except:
-        pass
+        time.sleep(20)
+
     images = []
     i = 1
     while True:
