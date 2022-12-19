@@ -11,46 +11,15 @@ from selenium.webdriver.common.keys import Keys
 from url_parser import parse_url, get_url, get_base_url
 from datetime import date
 from datetime import timedelta
-
+from confing import target_townhouse,target_house,target_appt
 # V2.2 -> scrap data using filter to get more info
 
 # Application path
 application_path = "/Users/paul-emile/Documents/PythonProject/scraping/"
 file_name = 'real_estate_data_v2p2.csv'
 file_path = os.path.join(application_path,file_name)
-
-#Target website
-website = target_link
-#chromedriver location
-path = "/Users/paul-emile/Downloads/chromedriver"
-
-# # Options
-# options = Options()
-# # don't open the browser
-# options.headless=True
-
-#Initializing Chrome driver
-service = Service(executable_path=path)
-driver = webdriver.Chrome(service = service)
-
-#Open the web page
-driver.get(website)
-
-# if we have a captcha at the start, we can do it manually
-import time
-time.sleep(20)
-
-
-LONG_MIN = -79.92244 #left
-LONG_MAX = -79.05638  #right
-LAT_MIN = 43.61090
-moving_from_left_to_right = True
-today = date.today()
-# load or create a dataframe
-try:
-    df = pd.read_csv(file_path)
-except:
-    df = pd.DataFrame()
+target_links = [target_townhouse,target_house,target_appt]
+property_types = ['Row /Town House', 'House', 'Appartement']
 
 
 
@@ -270,18 +239,54 @@ def move(driver,LAT_MIN,LONG_MAX,LONG_MIN,moving_from_left_to_right):
             move_down(driver)
             return moving_from_left_to_right,True
 
-need_move = True
-while need_move:
-    max_page = get_max_page(driver)
+for target_link,property_type in zip(target_links,property_types):
+    #Target website
+    website = target_link
+    #chromedriver location
+    path = "/Users/paul-emile/Downloads/chromedriver"
 
-    #print(max_page)
+    # # Options
+    # options = Options()
+    # # don't open the browser
+    # options.headless=True
 
-    for i in range(max_page):
-        df = scrape_page(df)
+    #Initializing Chrome driver
+    service = Service(executable_path=path)
+    driver = webdriver.Chrome(service = service)
+
+    #Open the web page
+    driver.get(website)
+
+    # if we have a captcha at the start, we can do it manually
+    import time
+    time.sleep(20)
+
+
+    LONG_MIN = -79.92244 #left
+    LONG_MAX = -79.05638  #right
+    LAT_MIN = 43.61090
+    moving_from_left_to_right = True
+    today = date.today()
+    # load or create a dataframe
+    try:
+        df = pd.read_csv(file_path)
+    except:
+        df = pd.DataFrame()
+
+    need_move = True
+    while need_move:
+        max_page = get_max_page(driver)
+
+        #print(max_page)
+
+        for i in range(max_page):
+            df = scrape_page(df)
+
+        df.drop_duplicates(subset=['address'],inplace=True)
+        moving_from_left_to_right,need_move = move(driver,LAT_MIN,LONG_MAX,LONG_MIN,moving_from_left_to_right)
+        time.sleep(4)#give the time to laod the page
 
     df.drop_duplicates(subset=['address'],inplace=True)
-    moving_from_left_to_right,need_move = move(driver,LAT_MIN,LONG_MAX,LONG_MIN,moving_from_left_to_right)
-    time.sleep(4)#give the time to laod the page
-df.drop_duplicates(subset=['address'],inplace=True)
-df.to_csv(file_path,index=False)
-driver.quit()
+    df['property_type'] = property_type
+    df.to_csv(file_path,index=False)
+    driver.quit()
